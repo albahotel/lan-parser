@@ -35,32 +35,21 @@ def get_controller_info():
         print(f"Соединение установлено успешно.")
 
         # 3. Создание Protobuf сообщения ClientMessage с запросом get_info
-        client_message = message_pb2.ClientMessage(get_info=message_pb2.GetInfo())
 
-        # === ИСПРАВЛЕНИЕ ЗДЕСЬ ===
-        # Чтобы установить поле 'get_info' в oneof 'message',
-        # просто обращаемся к полю 'get_info'. Это активирует его в oneof
-        # и возвращает экземпляр message_pb2.GetInfo().
-        # Если бы message_pb2.GetInfo() имело поля, мы бы могли установить их вот так:
-        # client_message.get_info.какое_то_поле = значение
-        # Но GetInfo пустое, поэтому достаточно простого обращения к полю get_info.
-        # =========================
+        getinfo = message_pb2.GetInfo()
+        client_message = message_pb2.ClientMessage(get_info=getinfo)
+
+        # Код для закрытия дверного замка (для смены действия поменять state на какое-то из message_pb2.States)
+        # setstate = message_pb2.SetState(state=message_pb2.States.DoorLockClose)
+        # client_message = message_pb2.ClientMessage(set_state=setstate)
 
         print("Создано ClientMessage с запросом get_info.")
-
-        # active_field = client_message.WhichOneof('message')
-        # print(f"Проверка состояния client_message перед сериализацией:")
-        # print(f"Активное поле в oneof 'message': {active_field}")
-        # if active_field != 'get_info':
-        #     print("ВНИМАНИЕ: Поле 'get_info' не установлено как активное в oneof 'message'!")
 
         # 4. Сериализация сообщения в байты
         request_data = client_message.SerializeToString()
         print(f"ClientMessage сериализовано в {len(request_data)} байт.")
 
-        # --- ВАЖНЫЙ МОМЕНТ: Определение границ сообщений по TCP ---
-        # (Тот же комментарий, что и раньше - при необходимости используйте префикс длины)
-        data_to_send = request_data # В этом упрощенном примере отправляем только данные
+        data_to_send = request_data
 
         print(f"Отправка {len(request_data)} байт данных сообщения.")
         client_socket.sendall(data_to_send)
